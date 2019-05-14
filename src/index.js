@@ -1,22 +1,27 @@
 import{ GraphQLServer} from 'graphql-yoga'
+import { getMaxListeners } from 'cluster';
 
-//Type Definitions (Schema)
-//if we leave type below without !, it can return null as well
-//All Types in GraphQL
+//Types in GraphQL
 //1.String, 2. Boolian, 3. Int 4. Float, 5. ID (to represent unique Identifier) 
+//convention Uppercase first letter for custom types in Graphql
 const typeDefs = `
     type Query  {
+        me: User!
+        post: Post!
+    }
+
+    type User   {
         id: ID!
         name: String!
-        age: Int!
-        isEmployed: Boolean!
-        gpa: Float
+        email: String!
+        age: Int
+    }
 
+    type Post   {
+        id: ID!
         title: String!
-        price: Float!
-        releaseYear: Int
-        rating: Float
-        inStock: Boolean!
+        body: String!
+        published: Boolean!
     }
 `
 
@@ -24,37 +29,21 @@ const typeDefs = `
 
 const resolvers =   {
     Query:  {
-        id()    {
-            return 'abc123'
+        me()    {
+            return {
+                id: '123098',
+                name: 'Sandeep Tikoo',
+                email: 'san.tik@example.com',
+                age: 28
+            }
         },
-        name()  {
-            return 'Sandeep Tikoo'
-        },
-        age()   {
-            return 34
-        },
-        isEmployed()    {
-            return true
-        },
-        gpa()   {
-            return 9.02
-            // return null
-        },
-
-        title()  {
-            return 'Avengers movie'
-        },
-        price() {
-            return 9.99
-        },
-        releaseYear()   {
-            return 2019
-        },
-        rating()    {
-            return 8.1
-        },
-        inStock()   {
-            return true
+        post()    {
+            return {
+                id: '444098',
+                title: 'Heya!',
+                body: 'How are you doing today?',
+                published: true
+            }
         }
     }
 }
