@@ -3,46 +3,15 @@ import { getMaxListeners } from 'cluster'
 // import { v1 as uui } from 'uuid'
 import { v4 as uuid } from 'uuid'
 
-//Demo user/posts data
-const users = [{
-        id: uuid(),
-        name: 'Sandeep',
-        email: 'sandeep@example.com',
+//Demo user/posts json data
+const users = [ {id: '1',name: 'Sandeep',email: 'sandeep@example.com'},
+                {id: '2',name: 'Arnav',email: 'arnav@example.com',age: 5},
+                {id: '3',name: 'Kiran',email: 'kiran@example.com',age: 33}]
 
-    },
-    {
-        id: uuid(),
-        name: 'Arnav',
-        email: 'arnav@example.com',
-        age: 5
-    },
-    {
-        id: uuid(),
-        name: 'Kiran',
-        email: 'kiran@example.com',
-        age: 33
-    }
-]
-const posts = [{
-        id: uuid(),
-        title: 'Hello!',
-        body: 'How are you doing',
-        published: true
-
-    },
-    {
-        id: uuid(),
-        title: 'Heya!',
-        body: 'How was your day at school?',
-        published: false
-    },
-    {
-        id: uuid(),
-        title: 'Hi There!',
-        body: 'Are we meeting tonight?',
-        published: true
-    }
-]
+const posts = [ {id: uuid(),title: 'Hello!',body: 'How are you doing',published: true,author: '3'},
+                {id: uuid(),title: 'Heya!',body: 'How was your day at school?',published: false,author: '2'},
+                {id: uuid(),title: 'Hi There!',body: 'Are we meeting tonight?',published: true,author: '1'}
+              ]
 
 // -------------------------------------------------
 
@@ -60,6 +29,7 @@ const typeDefs = `
         name: String!
         email: String!
         age: Int
+        posts: [Post]!
     }
 
     type Post   {
@@ -67,6 +37,7 @@ const typeDefs = `
         title: String!
         body: String!
         published: Boolean!
+        author: User!
     }
 `
 
@@ -96,7 +67,8 @@ const resolvers =   {
                 id: uuid(),
                 title: 'Heya!',
                 body: 'How are you doing today?',
-                published: true
+                published: true,
+                author: User
             }
         },
         users(parent,args,ctx,info) {
@@ -113,15 +85,33 @@ const resolvers =   {
                 return posts
             }
             return posts.filter((post)   =>  {
-                return post.title.toLowerCase().includes(args.query.toLowerCase())
+                // return post.title.toLowerCase().includes(args.query.toLowerCase())
+                const isTitleMatch = post.title.toLowerCase().includes(args.query.toLowerCase())
+                const isBodyMatch  = post.body.toLowerCase().includes(args.query.toLowerCase())
+                console.log(isTitleMatch)
+                return isTitleMatch || isBodyMatch
             })
             // return users
         }
-
-
+    },
+    // If we have to get the data of the custom type among static types, we define new function on root to get the data of that custom property
+    Post:   {
+        author(parent,args,ctx,info)    {
+            return users.find((user)    =>  {
+                return user.id === parent.author
+            })
+            // Return user object, match User object's Author id with Parents(Posts) Author Id
+            // This method will be called for Each Post
+        }
+    },
+    User:   {
+        posts(parent,args,ctx,info) {
+            return posts.find((post) =>   {
+                return post.id === parent.id
+            })
+        }
     }
 }
-
 
 const server = new GraphQLServer({
     typeDefs: typeDefs,
