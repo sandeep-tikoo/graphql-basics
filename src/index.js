@@ -129,9 +129,10 @@ const resolvers =   {
             }
             const user =    { //build user object
                 id: uuid(),
-                name: args.name,
-                email: args.email,
-                age: args.age
+                // name: args.name,
+                // email: args.email,
+                // age: args.age
+                ...args // transform-object-rest-spread operator, it copies all the attributes of specified object here,in this case of args object
             }
             users.push(user) //Add user object to users array.
             return user //Send the current crested user back in response
@@ -143,10 +144,11 @@ const resolvers =   {
             }
             const post =    { //build post object
                 id: uuid(),
-                title: args.title,
-                body: args.body,
-                published: args.published,
-                author: args.author
+                // title: args.title,
+                // body: args.body,
+                // published: args.published,
+                // author: args.author
+                ...args // transform-object-rest-spread operator, it copies all the attributes of specified object here,in this case of args object
             }
             posts.push(post) //Add post object to posts array.
             return post //Send the current created post back in response
@@ -164,15 +166,14 @@ const resolvers =   {
 
             const comment = { //build comment object
                 id: uuid(),
-                text: args.text,
-                author: args.author,
-                post: args.post
-            } 
+                // text: args.text,
+                // author: args.author,
+                // post: args.post
+                ...args // transform-object-rest-spread operator, it copies all the attributes of specified object here,in this case of args object
+            }
             
             comments.push(comment) // add comment object to comments array
             return comment // return the current created comment object back in response
-
-
         }
 
     },
