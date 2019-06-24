@@ -27,28 +27,9 @@ const typeDefs = `
     }
 
     type Mutation   {
-        createUser(data: CreateUserInput): User!
-        createPost(data: CreatePostInput): Post!
-        createComment(data: CreateCommentInput): Comment!
-    }
-
-    input   CreateUserInput {
-        name: String!
-        email: String!
-        age: Int
-    }
-
-    input   CreatePostInput {
-        title: String!
-        body: String!
-        published: Boolean!
-        author: ID!
-    }
-
-    input   CreateCommentInput {
-        text: String!
-        author: ID!
-        post: ID!
+        createUser(name: String!, email: String!, age: Int): User!
+        createPost(title: String!,body: String!,published: Boolean!, author: ID!): Post!
+        createComment(text: String!, author:ID!, post: ID!): Comment!
     }
 
     type User   {
@@ -142,26 +123,24 @@ const resolvers =   {
     Mutation:   {
         createUser(parent,args,ctx,info)    {
             console.log(args)
-            const emailTaken = users.some((user) =>  user.email === args.data.email) // Check if email is taken by checking one byone in user's array, notice "some" keyword
+            const emailTaken = users.some((user) =>  user.email === args.email) // Check if email is taken by checking one byone in user's array, notice "some" keyword
             if (emailTaken) {
                 throw new Error ('Email is in use by someone else!!')
             }
-
             const user =    { //build user object
                 id: uuid(),
                 // name: args.name,
                 // email: args.email,
                 // age: args.age
-                ...args.data // transform-object-rest-spread operator, it copies all the attributes of specified object here,in this case of args object
+                ...args // transform-object-rest-spread operator, it copies all the attributes of specified object here,in this case of args object
             }
             users.push(user) //Add user object to users array.
             return user //Send the current crested user back in response
         },
         createPost(parent,args,ctx,info)    {
-            const activeUser = users.some((user) =>  user.id === args.data.author) // Check if user is there by checking one by one in user's array, notice "some" keyword
-            
+            const activeUser = users.some((user) =>  user.id === args.author) // Check if user is there by checking one by one in user's array, notice "some" keyword
             if (!activeUser) {
-                throw new Error ('User not found, post failed...' + args.data.author)
+                throw new Error ('User not found, post failed...')
             }
             const post =    { //build post object
                 id: uuid(),
@@ -169,14 +148,14 @@ const resolvers =   {
                 // body: args.body,
                 // published: args.published,
                 // author: args.author
-                ...args.data // transform-object-rest-spread operator, it copies all the attributes of specified object here,in this case of args object
+                ...args // transform-object-rest-spread operator, it copies all the attributes of specified object here,in this case of args object
             }
             posts.push(post) //Add post object to posts array.
             return post //Send the current created post back in response
         },
         createComment(parent,args,ctx,info) {
-            const activeUser = users.some((user) =>  user.id === args.data.author) // Check if user is there by checking one by one in users array, notice "some" keyword
-            const activePost = posts.some((post) =>  post.id === args.data.post && post.published) // Check if post is there  and published = true by checking one by one in posts array, notice "some" keyword
+            const activeUser = users.some((user) =>  user.id === args.author) // Check if user is there by checking one by one in users array, notice "some" keyword
+            const activePost = posts.some((post) =>  post.id === args.post && post.published) // Check if post is there  and published = true by checking one by one in posts array, notice "some" keyword
 
             if (!activeUser)    {
                 throw new Error ('User not found, comment failed...')
@@ -190,7 +169,7 @@ const resolvers =   {
                 // text: args.text,
                 // author: args.author,
                 // post: args.post
-                ...args.data // transform-object-rest-spread operator, it copies all the attributes of specified object here,in this case of args object
+                ...args // transform-object-rest-spread operator, it copies all the attributes of specified object here,in this case of args object
             }
             
             comments.push(comment) // add comment object to comments array
