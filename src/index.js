@@ -4,13 +4,13 @@ import { getMaxListeners } from 'cluster'
 import { v4 as uuid } from 'uuid'
 
 //Demo user/posts json data
-const users = [     {id: '1',name: 'Sandeep',email: 'sandeep@example.com'},
+let users = [     {id: '1',name: 'Sandeep',email: 'sandeep@example.com'},
                     {id: '2',name: 'Arnav',email: 'arnav@example.com',age: 5},
                     {id: '3',name: 'Kiran',email: 'kiran@example.com',age: 33}]
-const posts = [     {id: '1',title: 'Hello!',body: 'How are you doing',published: true, author: '3'},
+let posts = [     {id: '1',title: 'Hello!',body: 'How are you doing',published: true, author: '3'},
                     {id: '2',title: 'Heya!',body: 'How was your day at school?',published: false, author: '2'},
                     {id: '3',title: 'Hi There!',body: 'Are we meeting tonight?',published: true, author: '1'}]
-const comments = [  {id: uuid(),text: 'Hi this is my first comment to arnav', author: '1', post: '1'},
+let comments = [  {id: uuid(),text: 'Hi this is my first comment to arnav', author: '1', post: '1'},
                     {id: uuid(),text: 'Hi this is my 2nd comment to arnav', author: '1', post: '1'},
                     {id: uuid(),text: 'Hi this is arnavS comment to kiran', author: '2', post: '2'},
                     {id: uuid(),text: 'Hi this is kiranS comment to deepu', author: '3', post: '3'}]
@@ -30,6 +30,10 @@ const typeDefs = `
         createUser(data: CreateUserInput): User!
         createPost(data: CreatePostInput): Post!
         createComment(data: CreateCommentInput): Comment!
+        deleteUser(id: ID!): User!
+        deletePost(id: ID!): Post!
+        deleteComment(id: ID!): Comment!
+
     }
 
     input   CreateUserInput {
@@ -157,6 +161,29 @@ const resolvers =   {
             users.push(user) //Add user object to users array.
             return user //Send the current crested user back in response
         },
+        deleteUser(parent,args,ctx,info)    {
+            const userIndex = users.findIndex((user) =>  user.id === args.id) // Check if user is there by checking one by one in user's array, notice "some" keyword
+            
+            if (userIndex === -1) {
+                throw new Error ('User not found, cannot Delete...')
+            }
+
+            const deletedUsers = users.splice(userIndex,1) //splice method accepts 2 arguments, userindex has the idex of the user and no of items starting the index, 
+            //for us just 1, it returns the item to be deleted as well, so we can have a return value as well
+            
+            posts = posts.filter((post)  => {
+                const match = post.author === args.id
+
+                if (match)  {
+                    comments = comments.filter((comment) => comment.post !== post.id)
+                }
+
+                return !match
+            })
+            comments = comments.filter((comment) =>  comment.author !== args.id)
+
+            return deletedUsers[0]
+        },
         createPost(parent,args,ctx,info)    {
             const activeUser = users.some((user) =>  user.id === args.data.author) // Check if user is there by checking one by one in user's array, notice "some" keyword
             
@@ -173,6 +200,18 @@ const resolvers =   {
             }
             posts.push(post) //Add post object to posts array.
             return post //Send the current created post back in response
+        },
+        deletePost(parent,args,ctx,info)    {
+            const postIndex = posts.findIndex((post) =>  post.id === args.id) // Check if user is there by checking one by one in user's array, notice "some" keyword
+            
+            if (postIndex === -1) {
+                throw new Error ('Post not found, cannot Delete...')
+            }
+
+            const deletedPosts = posts.splice(postIndex,1) //splice method accepts 2 arguments, userindex has the idex of the user and no of items starting the index, 
+            //for us just 1, it returns the item to be deleted as well, so we can have a return value as well
+
+            return deletedPosts[0]
         },
         createComment(parent,args,ctx,info) {
             const activeUser = users.some((user) =>  user.id === args.data.author) // Check if user is there by checking one by one in users array, notice "some" keyword
@@ -195,6 +234,18 @@ const resolvers =   {
             
             comments.push(comment) // add comment object to comments array
             return comment // return the current created comment object back in response
+        },
+        deleteComment(parent,args,ctx,info)    {
+            const commentIndex = comments.findIndex((comment) =>  comment.id === args.id) // Check if user is there by checking one by one in user's array, notice "some" keyword
+            
+            if (commentIndex === -1) {
+                throw new Error ('Post not found, cannot Delete...')
+            }
+
+            const deletedComments = comments.splice(commentIndex,1) //splice method accepts 2 arguments, userindex has the idex of the user and no of items starting the index, 
+            //for us just 1, it returns the item to be deleted as well, so we can have a return value as well
+
+            return deletedComments[0]
         }
 
     },
