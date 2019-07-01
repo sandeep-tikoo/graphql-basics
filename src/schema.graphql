@@ -15,25 +15,45 @@
         deleteUser(id: ID!): User!
         deletePost(id: ID!): Post!
         deleteComment(id: ID!): Comment!
+
+        updateUser(id: ID!, data: UpdateUserInput): User!
+        updatePost(id: ID!, data: UpdatePostInput): Post!
+        updateComment(id: ID!, data: UpdateCommentInput): Comment!
     }
 
-    input   CreateUserInput {
+    input CreateUserInput {
         name: String!
         email: String!
         age: Int
     }
 
-    input   CreatePostInput {
+    input UpdateUserInput {
+        name: String
+        email: String
+        age: Int
+    }
+
+    input CreatePostInput {
         title: String!
         body: String!
         published: Boolean!
         author: ID!
     }
 
-    input   CreateCommentInput {
+    input UpdatePostInput {
+        title: String
+        body: String
+        published: Boolean
+    }
+
+    input CreateCommentInput {
         text: String!
         author: ID!
         post: ID!
+    }
+
+    input UpdateCommentInput {
+        text: String
     }
 
     type User   {

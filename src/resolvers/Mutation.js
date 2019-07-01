@@ -41,6 +41,31 @@ const Mutation = {
 
         return deletedUsers[0]
     },
+    updateUser(parent,args,{ db },info)  {
+        const {id, data}    = args
+        const user = db.users.find((user) => user.id === args.id)
+
+        if (!user)  {
+            throw new Error ('User not found, cannot Update...')
+        }
+
+        if (typeof data.email === 'string') {
+            const emailTaken = db.users.some((user) => user.email === data.email)
+            if (emailTaken) {
+                throw new Error ('Email in use...')
+            }
+            user.email = data.email
+        } 
+        if (typeof data.name === 'string')  {
+            user.name = data.name
+        }
+
+        if (typeof data.age !== 'undefined')  {
+            user.age = data.age
+        }
+
+        return user
+    },
     createPost(parent,args,{ db },info)    {
         const activeUser = db.users.some((user) =>  user.id === args.data.author) // Check if user is there by checking one by one in user's array, notice "some" keyword
         
@@ -69,6 +94,27 @@ const Mutation = {
         //for us just 1, it returns the item(s) to be deleted as well, so we can have a return value as well
 
         return deletedPosts[0]
+    },
+    updatePost(parent,args,{ db },info)  {
+        const {id, data}    = args
+        const post = db.posts.find((post) => post.id === args.id)
+
+        if (!post)  {
+            throw new Error ('Post not found, cannot Update...')
+        }
+
+        if (typeof data.title === 'string') {
+            post.title = data.title
+        } 
+        if (typeof data.body === 'string')  {
+            post.body = data.body
+        }
+
+        if (typeof data.published === 'boolean')  {
+            post.published = data.published
+        }
+
+        return post
     },
     createComment(parent,args,{ db },info) {
         const activeUser = db.users.some((user) =>  user.id === args.data.author) // Check if user is there by checking one by one in users array, notice "some" keyword
@@ -103,6 +149,21 @@ const Mutation = {
         //for us just 1, it returns the item to be deleted as well, so we can have a return value as well
 
         return deletedComments[0]
+    },
+    updateComment(parent,args,{ db },info)  {
+        const {id, data}    = args
+        const comment = db.comments.find((comment) => comment.id === args.id)
+
+        if (!comment)  {
+            throw new Error ('comment not found, cannot Update...')
+        }
+
+        if (typeof data.text === 'string') {
+            comment.text = data.text
+        } 
+
+        return comment
+
     }
 
 }
