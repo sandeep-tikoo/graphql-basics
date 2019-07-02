@@ -8,7 +8,7 @@ import Comment from  './resolvers/Comment'
 
 const server = new GraphQLServer({
     typeDefs: './src/schema.graphql',
-    resolvers: { //importing above and here telling Graphql Server that below are the resolver objects
+    resolvers: { //importing above and here telling Graphql Server that below are the resolver objects - Sandeep
         Query,
         Mutation,
         User,
