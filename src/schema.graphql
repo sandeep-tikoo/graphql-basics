@@ -21,6 +21,15 @@
         updateComment(id: ID!, data: UpdateCommentInput): Comment!
     }
 
+    type Subscription {
+        # Count: {count: Int!, second: Int, minute: Int, hour: Int}
+        count: Int!
+        second: Int!
+        minute: Int
+        hour: Int
+    }
+    
+
     input CreateUserInput {
         name: String!
         email: String!
